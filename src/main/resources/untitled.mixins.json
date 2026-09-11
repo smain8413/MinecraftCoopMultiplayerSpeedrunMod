@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.github.smain8413.untitled.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "GameJoinMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": false
+  }
+}
