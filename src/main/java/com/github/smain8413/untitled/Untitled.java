@@ -9,18 +9,18 @@ public class Untitled implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run(){
-                something();
-            }
-        };
+        System.out.println("what");
+//        Timer timer = new Timer();
+//        TimerTask task = new TimerTask() {
+//            @Override
+//            public void run(){
+//                something();
+//            }
+//        };
 
     }
     public void something() {
-        serverStuff.forceCloseRegionFiles(null);
+//        serverStuff.forceCloseRegionFiles(null);
     }
 
 
