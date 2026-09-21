@@ -13,7 +13,7 @@ base {
 
 fabricApi {
     configureDataGeneration {
-        client = true
+//        client = true
     }
 }
 

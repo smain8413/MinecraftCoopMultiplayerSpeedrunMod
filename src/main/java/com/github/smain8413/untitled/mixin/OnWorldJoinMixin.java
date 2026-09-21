@@ -23,30 +23,38 @@ public class OnWorldJoinMixin {
     @Shadow
     private ClientWorld world;
 
-    @Shadow
-    private int chunkLoadDistance;
-
-    @Shadow
-    private MinecraftClient client;
+//    @Shadow
+//    private int chunkLoadDistance;
+//
+//    @Shadow
+//    private MinecraftClient client;
 
     //    @WrapMethod(method = "onGameJoin", at = @At(value = "TAIL", target = "net/minecraft/client/network/ClientPlayNetworkHandler"))
     @Inject(method = "onGameJoin", at = @At(value = "TAIL"))
     private void injected(GameJoinS2CPacket packet, CallbackInfo info) {
-        ClientPlayNetworkHandler thisObject = (ClientPlayNetworkHandler) (Object)this;
+//        ClientPlayNetworkHandler thisObject = (ClientPlayNetworkHandler) (Object)this;
         System.out.println("game joined");
-        ClientWorld oldClientWorld = world;
-        world = null;
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run(){
-                world = oldClientWorld;
-            }}, 3000);
+//        ClientWorld oldClientWorld = world;
+//        world = null;
+
+//        try {
+//            info.wait(3000);
+//            System.out.println("HIIIIIII");
+//            world = oldClientWorld;
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
+//        new Timer().schedule(new TimerTask() {
+//            @Override
+//            public void run(){
+//                System.out.println("HIIIIIII");
+////                world = oldClientWorld;
+////                System.exit(0);
+//                world = oldClientWorld;
+//            }}, 3000);
 
     }
 
-//    @Unique
-//    private ClientWorld generateClientWorld(ClientPlayNetworkHandler thisObject, GameJoinS2CPacket packet) {
-//        return new ClientWorld(thisObject, new ClientWorld.Properties(Difficulty.HARD, true, true), packet.getDimensionId(), DimensionType.THE_NETHER_REGISTRY_KEY, DimensionType.getOverworldDimensionType(), chunkLoadDistance, client::getProfiler, client.worldRenderer, packet.isDebugWorld(), packet.getSha256Seed() );
-//    }
 
 }
