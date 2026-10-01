@@ -91,13 +91,14 @@ public class MixinUtils {
         } catch (Exception e) {
             LOGGER.error(e.toString());
         }
-        worlds.forEach(world -> world.savingDisabled = false);
+//        worlds.forEach(world -> world.savingDisabled = false);
+
         try {
             setPrivate(session.getClass().getDeclaredField("lock"), SessionLock.create(session.getDirectory(WorldSavePath.ROOT)), session);
         } catch (Exception e) {
             LOGGER.error(e.toString());
         }
-
+        worlds.forEach(world -> world.save(null, true, false));
         players.forEach(ServerPlayerEntity::kill);
 //        worlds.forEach(world -> world.save());
     }
@@ -110,9 +111,11 @@ public class MixinUtils {
 
         // fix registrykey / dimensionType
         ServerWorld world = new ServerWorld(server, Util.getServerWorkerExecutor(), session,
-                server.getSaveProperties().getMainWorldProperties(), TEMP_WORLD, TEMP_WORLD_TYPE,
-                DimensionType.getOverworldCavesDimensionType(), dummyGenerationProgressListener,
-                Objects.requireNonNull(server.getWorld(World.END)).getChunkManager().getChunkGenerator(), true, BiomeAccess.hashSeed(1L), list, false);
+                server.getSaveProperties().getMainWorldProperties(), TEMP_WORLD, DimensionType.OVERWORLD_CAVES_REGISTRY_KEY,
+                DimensionType.getOverworldDimensionType(), dummyGenerationProgressListener,
+                Objects.requireNonNull(server.getWorld(World.OVERWORLD)).getChunkManager().getChunkGenerator(), true, BiomeAccess.hashSeed(1L), list, false);
+
+//        world = server.getWorld(World.END);
 //        world.savingDisabled = true;
         server.getWorlds();
         return world;

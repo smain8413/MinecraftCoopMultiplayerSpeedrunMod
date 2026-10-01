@@ -1,6 +1,7 @@
 package com.github.smain8413.untitled.mixin;
 
 
+//import com.github.smain8413.untitled.MixinUtils;
 import com.github.smain8413.untitled.MixinUtils;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;
@@ -8,15 +9,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Random;
 

@@ -5,10 +5,12 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "LivingEntityMixin",
+    "MainMenuMixin",
     "OnWorldJoinMixin",
     "ServerAccessor",
     "ServerMixin",
-    "ServerPlayerEntityMixin"
+    "ServerPlayerEntityMixin",
+    "ServerWorldAccesor"
   ],
   "client": [
   ],

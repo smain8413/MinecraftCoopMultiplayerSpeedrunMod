@@ -1,13 +1,11 @@
 package com.github.smain8413.untitled.mixin;
 
 
-import com.github.smain8413.untitled.MixinUtils;
+//import com.github.smain8413.untitled.MixinUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Packet;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,7 +30,7 @@ public abstract class LivingEntityMixin extends Entity {
         // assumes standard
         if (this.getType() != EntityType.ENDER_DRAGON || this.dead || this.removed) return;
 
-        MixinUtils.resetWorld(this.getServer(), 0);
+//        MixinUtils.resetWorld(this.getServer(), 0);
     }
 
 }
