@@ -2,6 +2,7 @@ package com.github.smain8413.untitled.mixin;
 
 
 //import com.github.smain8413.untitled.MixinUtils;
+import com.github.smain8413.untitled.MixinUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -30,7 +31,7 @@ public abstract class LivingEntityMixin extends Entity {
         // assumes standard
         if (this.getType() != EntityType.ENDER_DRAGON || this.dead || this.removed) return;
 
-//        MixinUtils.resetWorld(this.getServer(), 0);
+        MixinUtils.resetWorld(this.getServer(), 0);
     }
 
 }

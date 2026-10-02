@@ -119,3 +119,6 @@ run/*
 build/*
 .gradle/*
 /run/logs/*
+/build/
+/.idea/
+/.gradle/

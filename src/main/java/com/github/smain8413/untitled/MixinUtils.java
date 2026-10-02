@@ -1,13 +1,18 @@
 package com.github.smain8413.untitled;
 
+import com.github.smain8413.untitled.mixin.ChunkGeneratorAccessor;
 import com.github.smain8413.untitled.mixin.ServerAccessor;
+import com.github.smain8413.untitled.mixin.ServerWorldAccessor;
+import com.github.smain8413.untitled.mixin.ThreadedAnvilChunkStorageAccessor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.ChunkPos;
@@ -59,10 +64,11 @@ public class MixinUtils {
             return;
 //            throw new RuntimeException(e);
         }
-        ((ServerAccessor)server).getWorlds().put(TEMP_WORLD, tempWorld);
-//        worlds.forEach(world -> world.savingDisabled = true);
+//        ((ServerAccessor)server).getWorlds().put(TEMP_WORLD, tempWorld);
+        worlds.forEach(world -> world.savingDisabled = true);
 //        players.forEach(player -> player.teleport(tempWorld, 0F, tempWorld.getTopY(Heightmap.Type.WORLD_SURFACE, 0, 0), 0F, 0f, 0f));
 //        players.forEach(player -> player.teleport(tempWorld, 0f, 255f, 0f, 0f, 0f));
+//        ServerWorld tempWorld = server.getWorld(World.END);
         try {
             for (ServerPlayerEntity player : players) {
                 player.teleport(tempWorld, 0f, 255f, 0f, 0f, 0f);
@@ -72,35 +78,70 @@ public class MixinUtils {
 //            throw new RuntimeException(e);
         }
 
+        for (ServerWorld world : server.getWorlds()) {
+            ServerChunkManager scm = world.getChunkManager();
+
+            System.out.println(
+                    world.getRegistryKey() +
+                            " -> " +
+                            scm.threadedAnvilChunkStorage
+            );
+        }
+
         //endregion unloadWorlds
 
-
+//        worlds.forEach(world -> world.save(null, false, false));
         List<File> worldDirs = Arrays.stream(Iterables.toArray(worlds, ServerWorld.class)).parallel().map(world -> session.getWorldDirectory(world.getRegistryKey())).collect(Collectors.toList());
-        worldDirs.remove(session.getWorldDirectory(tempWorld.getRegistryKey()));
+//        worldDirs.remove(session.getWorldDirectory(tempWorld.getRegistryKey()));
+        worlds.forEach(world -> world.savingDisabled = false);
         try {
             session.deleteSessionLock();
         } catch (IOException iOException2) {
             LOGGER.error("Failed to unlock level {}", session.getDirectoryName(), iOException2);
         }
-
-        //noinspection ResultOfMethodCallIgnored
-        worldDirs.forEach(File::delete);
-
+        server.getWorlds().forEach(world -> ((ChunkGeneratorAccessor)((ServerWorldAccessor) world).untitled$getServerChunkManager().getChunkGenerator()).untitled$setSeed(world.getSeed()));
+//        server.getWorlds().forEach(world -> {
+//            try {
+//                world.close();
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
+////        noinspection ResultOfMethodCallIgnored
+//        worldDirs.forEach(File::delete);
+        worldDirs.forEach(file -> {
+            boolean deleted = file.delete();
+            System.out.println(Arrays.toString(file.listFiles()));
+            System.out.printf("Deleting %s: %s%n", file, deleted);
+        });
+        System.out.println("pt 1");
         try {
             setPrivate(GeneratorOptions.class.getDeclaredField("seed"), seed, server.getSaveProperties().getGeneratorOptions());
         } catch (Exception e) {
             LOGGER.error(e.toString());
         }
-//        worlds.forEach(world -> world.savingDisabled = false);
-
+        System.out.println("pt 2");
         try {
             setPrivate(session.getClass().getDeclaredField("lock"), SessionLock.create(session.getDirectory(WorldSavePath.ROOT)), session);
         } catch (Exception e) {
             LOGGER.error(e.toString());
         }
-        worlds.forEach(world -> world.save(null, true, false));
-        players.forEach(ServerPlayerEntity::kill);
+
+        System.out.println("pt 3");
+
+        server.getWorlds().forEach(world -> world.savingDisabled = false);
+        tempWorld.getPlayers().forEach(ServerPlayerEntity::kill);
+//        worlds.forEach(world -> world.getSeed());
+//        worlds.forEach(world -> world.save(null, true, false));
+//        players.forEach(ServerPlayerEntity::kill);
 //        worlds.forEach(world -> world.save());
+//        server.getWorlds().forEach(world -> world.save(null, true, false));
+//        server
+        server.getWorlds().forEach(world -> System.out.printf("world %s seed:%d%n", world.toString(), world.getSeed()));
+        System.out.printf("server seed: %d", server.getSaveProperties().getGeneratorOptions().getSeed());
+//        server.getWorlds().forEach(world -> world.save(null, false, false));
+
+        System.out.println("pt f");
     }
 
 
@@ -109,11 +150,16 @@ public class MixinUtils {
         LevelStorage.Session session = getPrivate(MinecraftServer.class.getDeclaredField("session"), server);
         List<Spawner> list = ImmutableList.of(new PhantomSpawner(), new WanderingTraderManager(server.getSaveProperties().getMainWorldProperties()));
 
+        ThreadedAnvilChunkStorage threadedAnvilChunkStorage = Objects.requireNonNull(server.getWorld(World.END)).getChunkManager().threadedAnvilChunkStorage;
+//        WorldGenerationProgressListener endGenProgressListener = ((ThreadedAnvilChunkStorageAccessor)threadedAnvilChunkStorage).untitled$getWorldGenerationProgressListener();
+
         // fix registrykey / dimensionType
         ServerWorld world = new ServerWorld(server, Util.getServerWorkerExecutor(), session,
-                server.getSaveProperties().getMainWorldProperties(), TEMP_WORLD, DimensionType.OVERWORLD_CAVES_REGISTRY_KEY,
+                server.getSaveProperties().getMainWorldProperties()
+                , TEMP_WORLD, DimensionType.OVERWORLD_CAVES_REGISTRY_KEY,
                 DimensionType.getOverworldDimensionType(), dummyGenerationProgressListener,
-                Objects.requireNonNull(server.getWorld(World.OVERWORLD)).getChunkManager().getChunkGenerator(), true, BiomeAccess.hashSeed(1L), list, false);
+                Objects.requireNonNull(server.getWorld(World.END)).getChunkManager().getChunkGenerator()
+                , true, BiomeAccess.hashSeed(1L), list, false);
 
 //        world = server.getWorld(World.END);
 //        world.savingDisabled = true;

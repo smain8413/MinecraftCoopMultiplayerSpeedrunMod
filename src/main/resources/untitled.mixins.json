@@ -4,13 +4,16 @@
   "package": "com.github.smain8413.untitled.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ChunkGeneratorAccessor",
     "LivingEntityMixin",
     "MainMenuMixin",
     "OnWorldJoinMixin",
     "ServerAccessor",
+    "ServerChunkManagerAccessor",
     "ServerMixin",
     "ServerPlayerEntityMixin",
-    "ServerWorldAccesor"
+    "ServerWorldAccessor",
+    "ThreadedAnvilChunkStorageAccessor"
   ],
   "client": [
   ],
