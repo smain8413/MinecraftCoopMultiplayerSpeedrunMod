@@ -1,12 +1,9 @@
 package com.github.smain8413.untitled;
 
 import com.github.smain8413.untitled.mixin.ChunkGeneratorAccessor;
-import com.github.smain8413.untitled.mixin.ServerAccessor;
 import com.github.smain8413.untitled.mixin.ServerWorldAccessor;
-import com.github.smain8413.untitled.mixin.ThreadedAnvilChunkStorageAccessor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,8 +13,6 @@ import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.village.ZombieSiegeManager;
-import net.minecraft.world.Heightmap;
 import net.minecraft.world.WanderingTraderManager;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeAccess;
@@ -26,19 +21,13 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.*;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.SessionLock;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.github.smain8413.untitled.Untitled.*;
 

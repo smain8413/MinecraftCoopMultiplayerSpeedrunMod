@@ -3,6 +3,7 @@ package com.github.smain8413.untitled.mixin;
 
 //import com.github.smain8413.untitled.MixinUtils;
 import com.github.smain8413.untitled.MixinUtils;
+import com.github.smain8413.untitled.ResetWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -13,6 +14,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Objects;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -31,7 +34,8 @@ public abstract class LivingEntityMixin extends Entity {
         // assumes standard
         if (this.getType() != EntityType.ENDER_DRAGON || this.dead || this.removed) return;
 
-        MixinUtils.resetWorld(this.getServer(), 0);
+//        MixinUtils.resetWorld(this.getServer(), 0);
+        ResetWorld.Reset(Objects.requireNonNull(this.getServer()), 0L);
     }
 
 }

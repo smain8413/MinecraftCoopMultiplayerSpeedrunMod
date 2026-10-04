@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ThreadedAnvilChunkStorageAccessor {
     @Accessor("worldGenerationProgressListener")
     @Mutable
-    WorldGenerationProgressListener untitled$getWorldGenerationProgressListener();
+    WorldGenerationProgressListener untitled$setWorldGenerationProgressListener();
 }

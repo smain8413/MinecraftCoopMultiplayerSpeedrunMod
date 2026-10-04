@@ -8,11 +8,13 @@
     "LivingEntityMixin",
     "MainMenuMixin",
     "OnWorldJoinMixin",
+    "GeneratorOptionsAccessor",
     "ServerAccessor",
     "ServerChunkManagerAccessor",
     "ServerMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldAccessor",
+    "SessionAccessor",
     "ThreadedAnvilChunkStorageAccessor"
   ],
   "client": [
