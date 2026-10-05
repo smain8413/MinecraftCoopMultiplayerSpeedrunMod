@@ -1,6 +1,7 @@
 package com.github.smain8413.untitled;
 
 import com.github.smain8413.untitled.mixin.*;
+import com.github.smain8413.untitled.utils.QueuedAction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
@@ -13,12 +14,12 @@ import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.io.FileUtils;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
 
 import static com.github.smain8413.untitled.Untitled.LOGGER;
 
@@ -45,12 +46,12 @@ public abstract class ResetWorld {
 
     public static void DeleteWorld(ServerWorld world) throws IOException {
         LevelStorage.Session session = ((ServerAccessor) world.getServer()).getSession();
-        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$tick(world.getChunkManager().threadedAnvilChunkStorage);
-        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$purge();
+//        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$tick(world.getChunkManager().threadedAnvilChunkStorage);
+//        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$purge();
 //        SessionAccessor sessionAccessor = (SessionAccessor) session;
         File worldDir = session.getWorldDirectory(world.getRegistryKey());
         WorldReLockData data = UnlockWorld(world);
-        world.savingDisabled = true;
+        world.savingDisabled = false;
 //        boolean success = worldDir.delete();
 //        if(!success) {
             try {
@@ -62,7 +63,7 @@ public abstract class ResetWorld {
 
         ReLockWorld(data, world.getServer(), !world.getRegistryKey().equals(world.getServer().getOverworld().getRegistryKey()));
         world.savingDisabled = false;
-        world.tick(() -> true);
+//        world.tick(() -> true);
 //        return success;
     }
 
@@ -163,5 +164,11 @@ public abstract class ResetWorld {
 
     }
 
-    public static void QueueDeleteWorld(ServerWorld world) {/*TODO implement if needed*/}
+    public static void QueueDeleteWorld(ServerWorld world) {
+        /*TODO implement if needed*/
+        EvacuatePlayer(world);
+        Runnable runnable = () -> System.out.println("nbaa");
+        ((ServerWorldExtras)world).runNextTick(new QueuedAction(runnable, 1));
+
+    }
 }

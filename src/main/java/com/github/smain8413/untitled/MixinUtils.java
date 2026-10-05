@@ -21,6 +21,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.*;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.SessionLock;
+import org.apache.http.annotation.Immutable;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -184,4 +185,5 @@ public class MixinUtils {
 
         }
     };
+
 }

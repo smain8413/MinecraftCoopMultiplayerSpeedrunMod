@@ -16,6 +16,7 @@
     "ServerMixin",
     "ServerPlayerEntityMixin",
     "ServerWorldAccessor",
+    "ServerWorldMixin",
     "SessionAccessor",
     "ThreadedAnvilChunkStorageAccessor"
   ],
