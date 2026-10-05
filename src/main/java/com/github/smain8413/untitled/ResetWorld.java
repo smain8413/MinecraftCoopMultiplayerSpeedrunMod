@@ -11,13 +11,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.SessionLock;
-import org.apache.logging.log4j.core.jmx.Server;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 
 import static com.github.smain8413.untitled.Untitled.LOGGER;
 
@@ -42,14 +43,27 @@ public abstract class ResetWorld {
         }
     }
 
-    public static boolean DeleteWorld(ServerWorld world) throws IOException {
+    public static void DeleteWorld(ServerWorld world) throws IOException {
         LevelStorage.Session session = ((ServerAccessor) world.getServer()).getSession();
+        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$tick(world.getChunkManager().threadedAnvilChunkStorage);
+        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$purge();
 //        SessionAccessor sessionAccessor = (SessionAccessor) session;
         File worldDir = session.getWorldDirectory(world.getRegistryKey());
         WorldReLockData data = UnlockWorld(world);
-        boolean success = worldDir.delete();
+        world.savingDisabled = true;
+//        boolean success = worldDir.delete();
+//        if(!success) {
+            try {
+                FileUtils.forceDelete(worldDir);
+            } catch (FileNotFoundException e) {
+                LOGGER.fatal(e.toString());
+            }
+//        }
+
         ReLockWorld(data, world.getServer(), !world.getRegistryKey().equals(world.getServer().getOverworld().getRegistryKey()));
-        return success;
+        world.savingDisabled = false;
+        world.tick(() -> true);
+//        return success;
     }
 
     protected static void EvacuatePlayer(ServerWorld world) {
@@ -89,6 +103,8 @@ public abstract class ResetWorld {
 
     protected static WorldReLockData UnlockWorld(ServerWorld world)  {
 //        world.savingDisabled = true;
+        EvacuatePlayer(world);
+        world.tick(() -> false);
         ServerWorldAccessor worldAccessor = (ServerWorldAccessor) world;
         ServerChunkManager chunkManager = worldAccessor.untitled$getServerChunkManager();
         LevelStorage.Session session = ((ServerAccessor) world.getServer()).getSession();
@@ -100,7 +116,6 @@ public abstract class ResetWorld {
             throw new RuntimeException(e);
         }
 //        List<ServerPlayerEntity> players = RemoveAndGetPlayers(world);
-        EvacuatePlayer(world);
         List<ServerPlayerEntity> players = world.getPlayers();
         return new WorldReLockData(threadedAnvilChunkStorage, players, session, chunkManager);
     }
@@ -136,13 +151,16 @@ public abstract class ResetWorld {
         List<ServerPlayerEntity> players = data.players;
         LevelStorage.Session session = data.session;
         SessionAccessor sessionAccessor = (SessionAccessor) session;
+        sessionAccessor.SetSessionLock(SessionLock.create(session.getDirectory(WorldSavePath.ROOT)));
         if (movePlayersToOverworld) {
             AtomicReference<ServerWorld> overworld = new AtomicReference<>(server.getOverworld());
             AtomicReference<BlockPos> overWorldSpawn = new AtomicReference<>(overworld.get().getSpawnPos());
             players.parallelStream().forEach(player -> player.teleport(overworld.get(), overWorldSpawn.get().getX(), overWorldSpawn.get().getY(), overWorldSpawn.get().getZ() + 1, 0, 0));
+//            server.getOverworld().tick(()->true);
         }
 //        server.getWorlds().forEach(world -> world.savingDisabled = false);
-        sessionAccessor.SetSessionLock(SessionLock.create(session.getDirectory(WorldSavePath.ROOT)));
+
+
     }
 
     public static void QueueDeleteWorld(ServerWorld world) {/*TODO implement if needed*/}

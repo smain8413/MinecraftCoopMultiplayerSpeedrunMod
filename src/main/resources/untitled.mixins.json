@@ -5,10 +5,12 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ChunkGeneratorAccessor",
+    "ChunkTicketManagerAccessor",
+    "ChunkTicketManagerMixin",
+    "GeneratorOptionsAccessor",
     "LivingEntityMixin",
     "MainMenuMixin",
     "OnWorldJoinMixin",
-    "GeneratorOptionsAccessor",
     "ServerAccessor",
     "ServerChunkManagerAccessor",
     "ServerMixin",
