@@ -11,6 +11,7 @@ public final class QueuedAction {
         this.ticksTillRun = Math.abs(ticksTillRun);
     }
     public void ticked() {
-        if (ticksTillRun--==0) action.run();
+        if (ticksTillRun--<=0) action.run();
     }
+    public int getTicksTillRun(){return ticksTillRun;}
 }

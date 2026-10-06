@@ -1,7 +1,6 @@
-package com.github.smain8413.untitled.mixin;
+package com.github.smain8413.untitled;
 
 import com.github.smain8413.untitled.utils.QueuedAction;
-import org.apache.http.annotation.Immutable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.List;
 
 public interface ServerWorldExtras {
      List<QueuedAction> tickQueueActions = new ArrayList<>();
-     default void runNextTick(QueuedAction action) {
-        tickQueueActions.add(action);
-    }
+
+     void untitled$runNextTick(QueuedAction action);
 }

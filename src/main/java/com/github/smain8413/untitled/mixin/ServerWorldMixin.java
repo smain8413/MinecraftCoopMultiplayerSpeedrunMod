@@ -1,26 +1,15 @@
 package com.github.smain8413.untitled.mixin;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.Npc;
-import net.minecraft.entity.boss.dragon.EnderDragonPart;
-import net.minecraft.entity.mob.WaterCreatureEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
+import com.github.smain8413.untitled.ServerWorldExtras;
+import com.github.smain8413.untitled.utils.QueuedAction;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import org.apache.http.annotation.Immutable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -36,6 +25,14 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
 //    @Shadow
 //    public abstract void tick(BooleanSupplier shouldKeepTicking);
 
+    @Unique
+    List<QueuedAction> tickQueueActions = new ArrayList<>();
+
+    @Override
+    public void untitled$runNextTick(QueuedAction action) {
+        tickQueueActions.add(action);
+    }
+
     protected ServerWorldMixin(MutableWorldProperties mutableWorldProperties, RegistryKey<World> registryKey, RegistryKey<DimensionType> registryKey2, DimensionType dimensionType, Supplier<Profiler> profiler, boolean bl, boolean bl2, long l) {
         super(mutableWorldProperties, registryKey, registryKey2, dimensionType, profiler, bl, bl2, l);
     }
@@ -45,8 +42,13 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
 
 
     @Inject(method = "tick", at = @At("TAIL"))
-    public void onTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci){
-        tickQueueActions.parallelStream().forEach((queuedAction -> {queuedAction.ticked(); tickQueueActions.remove(queuedAction);}));
+    public void onTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci){ // maybe if you tag it onto save instead
+//        tickQueueActions.parallelStream().forEach((queuedAction -> {queuedAction.ticked(); tickQueueActions.remove(queuedAction);}));
+        if (tickQueueActions.isEmpty()) return;
+        QueuedAction first = tickQueueActions.get(0);
+        first.ticked();
+        LOGGER.info("ticks: "+first.getTicksTillRun());
+        if (first.getTicksTillRun() <= 0) tickQueueActions.remove(first);
     }
 
 //    @Unique

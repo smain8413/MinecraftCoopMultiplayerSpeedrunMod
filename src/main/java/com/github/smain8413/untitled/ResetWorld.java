@@ -24,8 +24,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.github.smain8413.untitled.Untitled.LOGGER;
 
 //@Mixin(MinecraftServer.class)
-public abstract class ResetWorld {
+public class ResetWorld {
     // Add a Queue method in ServerMixin
+
 
     public static void Reset(MinecraftServer server, long seed) {
         ServerAccessor serverAccessor = (ServerAccessor) server;
@@ -36,12 +37,12 @@ public abstract class ResetWorld {
             throw new RuntimeException(e);
         }
         ((GeneratorOptionsAccessor)server.getSaveProperties().getGeneratorOptions()).setSeed(seed);
-        try {
-             DeleteWorld(Objects.requireNonNull(server.getWorld(World.NETHER)));
-            DeleteWorld(Objects.requireNonNull(server.getWorld(World.END)));
-        } catch (IOException e) {
-            LOGGER.fatal(e.toString());
-        }
+//        try {
+//             DeleteWorld(Objects.requireNonNull(server.getWorld(World.NETHER)));
+//            DeleteWorld(Objects.requireNonNull(server.getWorld(World.END)));
+//        } catch (IOException e) {
+//            LOGGER.fatal(e.toString());
+//        }
     }
 
     public static void DeleteWorld(ServerWorld world) throws IOException {
@@ -54,14 +55,31 @@ public abstract class ResetWorld {
         world.savingDisabled = false;
 //        boolean success = worldDir.delete();
 //        if(!success) {
+
+//            try {
+//                FileUtils.forceDelete(worldDir);
+//            } catch (FileNotFoundException e) {
+//                LOGGER.fatal(e.toString());
+//            }
+////        }
+//
+//        ReLockWorld(data, world.getServer(), !world.getRegistryKey().equals(world.getServer().getOverworld().getRegistryKey()));
+
+        QueueDeleteWorld(world, () -> {
             try {
                 FileUtils.forceDelete(worldDir);
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 LOGGER.fatal(e.toString());
             }
 //        }
 
-        ReLockWorld(data, world.getServer(), !world.getRegistryKey().equals(world.getServer().getOverworld().getRegistryKey()));
+            try {
+                ReLockWorld(data, world.getServer(), !world.getRegistryKey().equals(world.getServer().getOverworld().getRegistryKey()));
+            } catch (IOException e) {
+                LOGGER.fatal(e.toString());
+            }
+            System.out.println("returning");
+        });
         world.savingDisabled = false;
 //        world.tick(() -> true);
 //        return success;
@@ -164,11 +182,11 @@ public abstract class ResetWorld {
 
     }
 
-    public static void QueueDeleteWorld(ServerWorld world) {
+    public static void QueueDeleteWorld(ServerWorld world, Runnable tempAction) { //try without unlock?
         /*TODO implement if needed*/
-        EvacuatePlayer(world);
-        Runnable runnable = () -> System.out.println("nbaa");
-        ((ServerWorldExtras)world).runNextTick(new QueuedAction(runnable, 1));
+//        EvacuatePlayer(world);
+//        Runnable runnable = () -> {};
+        ((ServerWorldExtras)world).untitled$runNextTick(new QueuedAction(tempAction, 100));
 
     }
 }
