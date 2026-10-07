@@ -89,6 +89,7 @@ public class MixinUtils {
         } catch (IOException iOException2) {
             LOGGER.error("Failed to unlock level {}", session.getDirectoryName(), iOException2);
         }
+        //noinspection resource
         server.getWorlds().forEach(world -> ((ChunkGeneratorAccessor)((ServerWorldAccessor) world).untitled$getServerChunkManager().getChunkGenerator()).untitled$setSeed(world.getSeed()));
 //        server.getWorlds().forEach(world -> {
 //            try {

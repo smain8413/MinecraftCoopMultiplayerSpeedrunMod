@@ -66,6 +66,7 @@ public class ResetWorld {
 //        ReLockWorld(data, world.getServer(), !world.getRegistryKey().equals(world.getServer().getOverworld().getRegistryKey()));
 
         QueueDeleteWorld(world, () -> {
+            System.out.println("running delete world");
             try {
                 FileUtils.forceDelete(worldDir);
             } catch (IOException e) {
@@ -123,7 +124,7 @@ public class ResetWorld {
     protected static WorldReLockData UnlockWorld(ServerWorld world)  {
 //        world.savingDisabled = true;
         EvacuatePlayer(world);
-        world.tick(() -> false);
+//        world.tick(() -> false);
         ServerWorldAccessor worldAccessor = (ServerWorldAccessor) world;
         ServerChunkManager chunkManager = worldAccessor.untitled$getServerChunkManager();
         LevelStorage.Session session = ((ServerAccessor) world.getServer()).getSession();
@@ -159,6 +160,7 @@ public class ResetWorld {
             session.deleteSessionLock();
         } catch (Exception ignored) {}
         @SuppressWarnings("UnnecessaryLocalVariable") ThreadedAnvilChunkStorage threadedAnvilChunkStorage = chunkManager.threadedAnvilChunkStorage;
+        threadedAnvilChunkStorage.close(); // find 1
 //        chunkManagerAccessor.untitled$setThreadedAnvilChunkStorage(null);
         return threadedAnvilChunkStorage;
     }
@@ -174,7 +176,7 @@ public class ResetWorld {
         if (movePlayersToOverworld) {
             AtomicReference<ServerWorld> overworld = new AtomicReference<>(server.getOverworld());
             AtomicReference<BlockPos> overWorldSpawn = new AtomicReference<>(overworld.get().getSpawnPos());
-            players.parallelStream().forEach(player -> player.teleport(overworld.get(), overWorldSpawn.get().getX(), overWorldSpawn.get().getY(), overWorldSpawn.get().getZ() + 1, 0, 0));
+            players.parallelStream().forEach(player -> player.teleport(overworld.get(), overWorldSpawn.get().getX(), overWorldSpawn.get().getY() + 1, overWorldSpawn.get().getZ(), 0, 0));
 //            server.getOverworld().tick(()->true);
         }
 //        server.getWorlds().forEach(world -> world.savingDisabled = false);
@@ -186,7 +188,7 @@ public class ResetWorld {
         /*TODO implement if needed*/
 //        EvacuatePlayer(world);
 //        Runnable runnable = () -> {};
-        ((ServerWorldExtras)world).untitled$runNextTick(new QueuedAction(tempAction, 100));
+        ((ServerWorldExtras)world.getServer().getWorld(World.END)).untitled$runNextTick(new QueuedAction(tempAction, 10));
 
     }
 }
