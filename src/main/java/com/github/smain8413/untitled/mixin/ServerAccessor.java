@@ -2,7 +2,6 @@ package com.github.smain8413.untitled.mixin;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
-import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -18,10 +17,10 @@ import java.util.Map;
 public interface ServerAccessor {
     @Accessor("worlds")
     @Mutable
-    Map<RegistryKey<World>, ServerWorld> getWorlds();
+    Map<RegistryKey<World>, ServerWorld> untitled$getWorlds();
 
     @Accessor("session")
-    LevelStorage.Session getSession();
+    LevelStorage.Session untitled$getSession();
 
     @Invoker("createWorlds")
     void untitled$createWorlds(WorldGenerationProgressListener listener);

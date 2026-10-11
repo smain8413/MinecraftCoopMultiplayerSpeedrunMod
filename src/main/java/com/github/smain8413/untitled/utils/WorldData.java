@@ -53,7 +53,7 @@ public final class WorldData {
         this.serverWorldAccessor = (ServerWorldAccessor) serverWorld;
         this.server = serverWorld.getServer();
         this.serverAccessor = (ServerAccessor)server;
-        this.session = serverAccessor.getSession();
+        this.session = serverAccessor.untitled$getSession();
         this.sessionAccessor = (SessionAccessor) session;
         this.serverChunkManager = serverWorldAccessor.untitled$getServerChunkManager();
         this.threadedAnvilChunkStorage = serverChunkManager.threadedAnvilChunkStorage;

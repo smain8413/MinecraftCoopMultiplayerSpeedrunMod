@@ -14,9 +14,7 @@ import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.io.FileUtils;
 
-import javax.swing.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -46,7 +44,7 @@ public class ResetWorld {
     }
 
     public static void DeleteWorld(ServerWorld world) throws IOException {
-        LevelStorage.Session session = ((ServerAccessor) world.getServer()).getSession();
+        LevelStorage.Session session = ((ServerAccessor) world.getServer()).untitled$getSession();
 //        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$tick(world.getChunkManager().threadedAnvilChunkStorage);
 //        ((ChunkTicketManagerAccessor) ((ServerChunkManagerAccessor) world.getChunkManager()).getTicketManager()).untitled$purge();
 //        SessionAccessor sessionAccessor = (SessionAccessor) session;
@@ -127,7 +125,7 @@ public class ResetWorld {
 //        world.tick(() -> false);
         ServerWorldAccessor worldAccessor = (ServerWorldAccessor) world;
         ServerChunkManager chunkManager = worldAccessor.untitled$getServerChunkManager();
-        LevelStorage.Session session = ((ServerAccessor) world.getServer()).getSession();
+        LevelStorage.Session session = ((ServerAccessor) world.getServer()).untitled$getSession();
         ThreadedAnvilChunkStorage threadedAnvilChunkStorage;
         try {
             //        chunkManagerAccessor.untitled$setThreadedAnvilChunkStorage(threadedAnvilChunkStorage);
