@@ -3,6 +3,7 @@ package com.github.smain8413.untitled.mixin;
 import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.world.chunk.Chunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -16,4 +17,8 @@ public interface ServerChunkManagerAccessor {
 
     @Accessor("ticketManager")
     ChunkTicketManager getTicketManager();
+
+    @Accessor("chunkCache")
+    @Mutable
+    Chunk[] getChunkCache();
 }

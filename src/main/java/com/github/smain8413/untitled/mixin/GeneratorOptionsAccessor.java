@@ -10,4 +10,6 @@ public interface GeneratorOptionsAccessor {
     @Accessor("seed")
     @Mutable
     void setSeed(long seed);
+
+//    @Accessor("chunkGenerat")
 }

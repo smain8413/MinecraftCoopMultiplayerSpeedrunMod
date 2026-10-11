@@ -1,6 +1,7 @@
 package com.github.smain8413.untitled.mixin;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.registry.RegistryKey;
@@ -21,4 +22,7 @@ public interface ServerAccessor {
 
     @Accessor("session")
     LevelStorage.Session getSession();
+
+    @Invoker("createWorlds")
+    void untitled$createWorlds(WorldGenerationProgressListener listener);
 }
