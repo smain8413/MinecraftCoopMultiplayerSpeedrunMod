@@ -5,10 +5,16 @@ import com.github.smain8413.untitled.utils.WorldData;
 //import com.google.gson.JsonObject;
 //import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
+import net.minecraft.data.SnbtProvider;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.JsonHelper;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -16,16 +22,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.*;
 
 import static com.github.smain8413.untitled.Untitled.LOGGER;
 
@@ -46,6 +50,7 @@ public class WorldReset {
 //        data.generatorOptionsAccessor.setSeed(new Random().nextLong());
         data.clearWorldData();
         deleteWorldDirectory(data);
+        findAndEditLevelDat(data);
 //        data.serverAccessor.getWorlds().replace(World.OVERWORLD, null);
         // change seed
 
@@ -57,17 +62,8 @@ public class WorldReset {
         // queue re-lock
         queueRunAction(safeWorld, new QueuedAction(() -> {
 //            @SuppressWarnings("OptionalGetWithoutIsPresent") File levelData = Arrays.stream(Objects.requireNonNull(safeWorld.session.getDirectory(WorldSavePath.ROOT).toFile().listFiles())).filter(file -> file.getName().equals("level.dat")).findFirst().get();
-//            JsonObject levelJson;
-//            try {
-//                levelJson = new JsonObject().getAsJsonObject(new String(Files.readAllBytes(levelData.toPath())));
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//            System.out.println(levelJson.get("Data").toString());
-            //            deleteWorldDirectory(data);
-//            safeWorld.server.getSaveProperties().getGeneratorOptions().getChunkGenerator();
-//            data.generatorOptionsAccessor.setSeed(new Random().nextLong());
             safeWorld.generatorOptionsAccessor.setSeed(new Random().nextLong());
+//            safeWorld.generatorOptionsAccessor
 //            evacuatePlayers(safeWorld);
             safeWorld.serverAccessor.untitled$createWorlds(new WorldGenerationProgressListener() {
                 @Override
@@ -86,6 +82,25 @@ public class WorldReset {
             safeWorld.clearWorldData();
 //            data.generatorOptionsAccessor.setSeed(new Random().nextLong());
         }, 100));
+    }
+
+    protected static void findAndEditLevelDat(WorldData data) {
+        Path directoryPath = data.session.getDirectory(WorldSavePath.ROOT);
+        File directory = directoryPath.toFile();
+        do { // level.dat
+            Optional<File> first = Arrays.stream(Objects.requireNonNull(directory.listFiles())).filter((file1 -> file1.getName().equals("level.dat"))).findFirst();
+            if (!first.isPresent()) break;
+            File level = first.get();
+//            JsonObject levelJson = new String(FileUtils.readFileToByteArray(level), StandardCharsets.UTF_8);
+            CompoundTag compoundTag;
+            try {
+                compoundTag = NbtIo.read(level);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } while (false);
+//        System.out.println(directory.toAbsolutePath());
+
     }
 
     protected static void unlock(WorldData data) throws IOException {
@@ -132,19 +147,38 @@ public class WorldReset {
         data.serverWorldExtra.untitled$runNextTick(action);
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected static void deleteWorldDirectory(WorldData data) {
         File worldDirectory = data.session.getWorldDirectory(data.worldRegistryKey);
-        File[] files = worldDirectory.listFiles();
-        for (int i = 0; i < (files != null ? files.length : 0); i++) {
-            System.out.println("d1:"+files[i]+"d2:"+ Arrays.toString(files[i].listFiles()));
-            if (files[i].getName().equals("data") && files[i].isDirectory()) continue;
-//            files[i].delete();
-            try {
-                FileUtils.forceDelete(files[i]);
-            } catch (IOException e) {
-                LOGGER.fatal(e.toString());
+//        File[] files = worldDirectory.listFiles();
+//        for (int i = 0; i < (files != null ? files.length : 0); i++) {
+//            System.out.println("d1:"+files[i]+"d2:"+ Arrays.toString(files[i].listFiles()));
+//
+//        }
+        try {
+            recursiveCleanDirectory(worldDirectory, List.of("level.dat", "raids.dat", "raids_end.dat", "icon.png", "stats", "datapacks"));
+        } catch (IOException e) {
+            LOGGER.error(e.toString());
+        }
+    }
+
+    public static void recursiveCleanDirectory(File dir, @Nullable List<String> ignoredFileNames) throws IOException {
+        if (!dir.exists()) return;
+        do {
+            if (ignoredFileNames == null) {
+                break;
             }
+            if (ignoredFileNames.parallelStream().filter(Objects::nonNull).anyMatch(name -> name.equals(dir.getName()))) {
+                return;
+            }
+        } while (false);
+        if (!dir.isDirectory()) {
+            FileUtils.forceDelete(dir);
+            return;
+        }
+        if (dir.listFiles() == null) return;
+
+        for (File file: Objects.requireNonNull(dir.listFiles())) {
+            recursiveCleanDirectory(file, ignoredFileNames);
         }
     }
 }
