@@ -2,8 +2,8 @@ package com.github.smain8413.untitled.mixin;
 
 
 //import com.github.smain8413.untitled.MixinUtils;
-import com.github.smain8413.untitled.MixinUtils;
-import com.github.smain8413.untitled.ResetWorld;
+//import com.github.smain8413.untitled.MixinUtils;
+//import com.github.smain8413.untitled.ResetWorld;
 import com.github.smain8413.untitled.WorldReset;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;

@@ -40,6 +40,7 @@ public class WorldReset {
 
     protected static void deleteWorld(ServerWorld world) {
         WorldData data = new WorldData(world);
+        data.server.save(false, true, false);
         // unlock
         WorldData safeWorld = evacuatePlayers(data);
         try {
@@ -48,17 +49,18 @@ public class WorldReset {
             LOGGER.fatal(e.toString());
         }
 //        data.generatorOptionsAccessor.setSeed(new Random().nextLong());
-        data.clearWorldData();
         deleteWorldDirectory(data);
+        try {
+            lock(data);
+        } catch (IOException e) {
+            LOGGER.fatal(e.toString());
+        }
+//        data.clearWorldData();
         findAndEditLevelDat(data);
 //        data.serverAccessor.getWorlds().replace(World.OVERWORLD, null);
         // change seed
 
-            try {
-                lock(data);
-            } catch (IOException e) {
-                LOGGER.fatal(e.toString());
-            }
+
         // queue re-lock
         queueRunAction(safeWorld, new QueuedAction(() -> {
 //            @SuppressWarnings("OptionalGetWithoutIsPresent") File levelData = Arrays.stream(Objects.requireNonNull(safeWorld.session.getDirectory(WorldSavePath.ROOT).toFile().listFiles())).filter(file -> file.getName().equals("level.dat")).findFirst().get();
@@ -85,19 +87,25 @@ public class WorldReset {
     }
 
     protected static void findAndEditLevelDat(WorldData data) {
-        Path directoryPath = data.session.getDirectory(WorldSavePath.ROOT);
-        File directory = directoryPath.toFile();
+//        Path directoryPath = data.session.getDirectory(WorldSavePath.ROOT);
+//        File directory = directoryPath.toFile();
         do { // level.dat
-            Optional<File> first = Arrays.stream(Objects.requireNonNull(directory.listFiles())).filter((file1 -> file1.getName().equals("level.dat"))).findFirst();
-            if (!first.isPresent()) break;
-            File level = first.get();
+//            Optional<File> first = Arrays.stream(Objects.requireNonNull(directory.listFiles())).filter((file1 -> file1.getName().equals("level.dat"))).findFirst();
+//            if (!first.isPresent()) break;
+//            File level = first.get();
+            File level = data.session.getDirectory(WorldSavePath.LEVEL_DAT).toFile();
 //            JsonObject levelJson = new String(FileUtils.readFileToByteArray(level), StandardCharsets.UTF_8);
             CompoundTag compoundTag;
             try {
                 compoundTag = NbtIo.read(level);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+//                throw new RuntimeException(e);
+                LOGGER.fatal("{}L103 WorldReset.java", e.toString());
+                break;
             }
+            assert compoundTag != null;
+            System.out.println(compoundTag.toText());
+            System.out.println(compoundTag.getCompound("Data").getCompound("WorldGenSettings").toText());
         } while (false);
 //        System.out.println(directory.toAbsolutePath());
 
@@ -112,7 +120,7 @@ public class WorldReset {
 //            for (int i = 0; i < 4; i++) {
 //                data.serverChunkManagerAccessor.getChunkCache()[i] = null;
 //            }
-            data.serverChunkManager.close();
+//            data.serverChunkManager.close();
 //            data.serverChunkManager.
         } catch (Exception e) {
             LOGGER.fatal(e.toString());
@@ -173,6 +181,7 @@ public class WorldReset {
         } while (false);
         if (!dir.isDirectory()) {
             FileUtils.forceDelete(dir);
+//            dir.delete();
             return;
         }
         if (dir.listFiles() == null) return;
