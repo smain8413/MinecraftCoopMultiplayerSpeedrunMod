@@ -6,12 +6,15 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +35,9 @@ public final class WorldData {
     public final ServerChunkManagerAccessor serverChunkManagerAccessor;
     public final ThreadedAnvilChunkStorageAccessor threadedAnvilChunkStorageAccessor;
     public boolean cleared = false;
+    public final Path rootDir;
+    public final Path dataDir;
+    public final File worldDir;
 
     private static final List<String> NOT_WORLD;
 
@@ -62,6 +68,9 @@ public final class WorldData {
         this.worldRegistryKey = serverWorld.getRegistryKey();
         this.serverChunkManagerAccessor = (ServerChunkManagerAccessor) serverChunkManager;
         threadedAnvilChunkStorageAccessor = (ThreadedAnvilChunkStorageAccessor) threadedAnvilChunkStorage;
+        rootDir = session.getDirectory(WorldSavePath.ROOT);
+        dataDir = session.getDirectory(WorldSavePath.LEVEL_DAT);
+        this.worldDir = session.getWorldDirectory(this.worldRegistryKey);
     }
 
     public void clearWorldData() {
