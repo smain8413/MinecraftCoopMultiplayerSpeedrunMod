@@ -2,17 +2,11 @@ package com.github.smain8413.untitled.utils;
 
 import com.github.smain8413.untitled.ServerWorldExtras;
 import com.github.smain8413.untitled.mixin.*;
-import net.minecraft.data.dev.NbtProvider;
-import net.minecraft.datafixer.NbtOps;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -22,17 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import static com.github.smain8413.untitled.Untitled.LOGGER;
@@ -119,14 +106,31 @@ public final class WorldData {
             GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(dataDir));
             data = NbtIo.read(new DataInputStream(gzip));
         } finally {
-            System.out.println(data.toText());
+//            System.out.println(data.toText());
         }
 //        if (data == null) throw new NullPointerException();
-        System.out.println(data.toText());
-        data.get("");
-
-
-        return data;
+//        System.out.println(data.toText());
+        return dataWithNewSeed(data, new Random().nextLong());
+    }
+    private CompoundTag dataWithNewSeed(CompoundTag data, Long seed) {
+        LongTag seedTag = LongTag.of(seed);
+        CompoundTag modifiedData = data;
+        modifiedData.getCompound("Data").getCompound("WorldGenSettings").remove("seed");
+        modifiedData.getCompound("Data").getCompound("WorldGenSettings").put("seed", seedTag);
+        for (ServerWorld serverWorld : server.getWorlds() ) {
+            String worldID = serverWorld.getRegistryKey().getValue().toString();
+            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").remove("seed");
+            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").put("seed", seedTag);
+            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").getCompound("biome_source").remove("seed");
+            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").getCompound("biome_source").put("seed", seedTag);
+        }
+        modifiedData.getCompound("Data").remove("Time");
+        modifiedData.getCompound("Data").remove("DayTime");
+        modifiedData.getCompound("Data").put("Time", LongTag.of(0));
+        modifiedData.getCompound("Data").put("DayTime", LongTag.of(0));
+        // try this
+        modifiedData.getCompound("Data").remove("Player");
+        return modifiedData;
     }
 
     public void clearWorldData() {
