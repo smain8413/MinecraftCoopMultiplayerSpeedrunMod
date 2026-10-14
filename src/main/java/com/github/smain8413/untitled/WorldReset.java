@@ -40,6 +40,7 @@ public class WorldReset {
 
     protected static void deleteWorld(ServerWorld world) {
         WorldData data = new WorldData(world);
+        if (true) return;
         data.server.save(false, true, false);
         // unlock
         Path WorldDir = data.session.getDirectory(WorldSavePath.ROOT);
@@ -58,10 +59,9 @@ public class WorldReset {
             LOGGER.fatal(e.toString());
         }
 //        data.clearWorldData();
-        findAndEditLevelDat(data);
+//        findAndEditLevelDat(data);
 //        data.serverAccessor.getWorlds().replace(World.OVERWORLD, null);
         // change seed
-
 
         // queue re-lock
         queueRunAction(safeWorld, new QueuedAction(() -> {
@@ -97,17 +97,21 @@ public class WorldReset {
 //            File level = first.get();
             File level = data.dataDir.toFile();
 //            JsonObject levelJson = new String(FileUtils.readFileToByteArray(level), StandardCharsets.UTF_8);
-            CompoundTag compoundTag;
+            CompoundTag compoundTag = null;
             try {
                 compoundTag = NbtIo.read(level);
             } catch (IOException e) {
 //                throw new RuntimeException(e);
                 LOGGER.fatal("{}@WorldReset.java:105", e.toString());
-                break;
+//                throw e;
+            } finally {
+                assert compoundTag != null;
+                compoundTag.toText();
             }
-            assert compoundTag != null;
-            System.out.println(compoundTag.toText());
-            System.out.println(compoundTag.getCompound("Data").getCompound("WorldGenSettings").toText());
+            break;
+//            assert compoundTag != null;
+//            System.out.println(compoundTag.toText());
+//            System.out.println(compoundTag.getCompound("Data").getCompound("WorldGenSettings").toText());
         } while (false);
 //        System.out.println(directory.toAbsolutePath());
 
