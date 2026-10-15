@@ -17,10 +17,14 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static com.github.smain8413.untitled.Untitled.LOGGER;
 
@@ -76,22 +80,19 @@ public final class WorldData {
         rootDir = session.getDirectory(WorldSavePath.ROOT);
         dataDir = session.getDirectory(WorldSavePath.LEVEL_DAT);
         this.worldDir = session.getWorldDirectory(this.worldRegistryKey);
-        while (true) {
-            try {
-                this.newLevelDat = newLevelData();
-            } catch (Exception e) {
-                LOGGER.fatal(e);
-            }
+        try {
+            this.newLevelDat = newLevelData();
+        } catch (Exception e) {
+            LOGGER.fatal(e);
         }
     }
 
-    private CompoundTag newLevelData() throws IOException, NullPointerException {
+    private CompoundTag newLevelData() throws IOException {
 //        System.out.println("newLevelData (WorldData.java)");
 ////        SessionLock.create(rootDir);
 //        FileChannel channel = FileChannel.open(dataDir, StandardOpenOption.READ, StandardOpenOption.SYNC);
 //        channel.position(0);
 //        InputStream inputStream = Channels.newInputStream(channel);
-        //noinspection ResultOfMethodCallIgnored
 //        inputStream.skip(5);
 //        ByteBuffer buf = ByteBuffer.allocateDirect(2048);
 //        channel.read(buf);
@@ -101,36 +102,36 @@ public final class WorldData {
 //        NbtIo.read(buf.);
         CompoundTag data = new CompoundTag();
 //        data.put("Horse", (Tag) BlockTags.ACACIA_LOGS);
-        try {
+//        try {
 //            data = NbtIo.readCompressed(dataDir);
-            GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(dataDir));
-            data = NbtIo.read(new DataInputStream(gzip));
-        } finally {
+        GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(dataDir));
+        data = NbtIo.read(new DataInputStream(gzip));
+//        } finally {
 //            System.out.println(data.toText());
-        }
+//        }
 //        if (data == null) throw new NullPointerException();
 //        System.out.println(data.toText());
+//        Files.newOutputStream(dataDir);
         return dataWithNewSeed(data, new Random().nextLong());
     }
     private CompoundTag dataWithNewSeed(CompoundTag data, Long seed) {
         LongTag seedTag = LongTag.of(seed);
-        CompoundTag modifiedData = data;
-        modifiedData.getCompound("Data").getCompound("WorldGenSettings").remove("seed");
-        modifiedData.getCompound("Data").getCompound("WorldGenSettings").put("seed", seedTag);
+        data.getCompound("Data").getCompound("WorldGenSettings").remove("seed");
+        data.getCompound("Data").getCompound("WorldGenSettings").put("seed", seedTag);
         for (ServerWorld serverWorld : server.getWorlds() ) {
             String worldID = serverWorld.getRegistryKey().getValue().toString();
-            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").remove("seed");
-            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").put("seed", seedTag);
-            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").getCompound("biome_source").remove("seed");
-            modifiedData.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").getCompound("biome_source").put("seed", seedTag);
+            data.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").remove("seed");
+            data.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").put("seed", seedTag);
+            data.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").getCompound("biome_source").remove("seed");
+            data.getCompound("Data").getCompound("WorldGenSettings").getCompound("dimensions").getCompound(worldID).getCompound("generator").getCompound("biome_source").put("seed", seedTag);
         }
-        modifiedData.getCompound("Data").remove("Time");
-        modifiedData.getCompound("Data").remove("DayTime");
-        modifiedData.getCompound("Data").put("Time", LongTag.of(0));
-        modifiedData.getCompound("Data").put("DayTime", LongTag.of(0));
+        data.getCompound("Data").remove("Time");
+        data.getCompound("Data").remove("DayTime");
+        data.getCompound("Data").put("Time", LongTag.of(0));
+        data.getCompound("Data").put("DayTime", LongTag.of(0));
         // try this
-        modifiedData.getCompound("Data").remove("Player");
-        return modifiedData;
+        data.getCompound("Data").remove("Player");
+        return data;
     }
 
     public void clearWorldData() {

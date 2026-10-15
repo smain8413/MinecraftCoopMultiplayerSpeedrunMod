@@ -40,17 +40,17 @@ public class WorldReset {
 
     protected static void deleteWorld(ServerWorld world) {
         WorldData data = new WorldData(world);
-        if (true) return;
+//        if (true) return;
         data.server.save(false, true, false);
         // unlock
-        Path WorldDir = data.session.getDirectory(WorldSavePath.ROOT);
-        Path DataDir = data.session.getDirectory(WorldSavePath.LEVEL_DAT);
+//        Path WorldDir = data.session.getDirectory(WorldSavePath.ROOT);
+//        Path DataDir = data.session.getDirectory(WorldSavePath.LEVEL_DAT);
         WorldData safeWorld = evacuatePlayers(data);
-//        try {
-//            unlock(data);
-//        } catch (IOException e) {
-//            LOGGER.fatal(e.toString());
-//        }
+        try {
+            unlock(data);
+        } catch (IOException e) {
+            LOGGER.fatal(e.toString());
+        }
 //        data.generatorOptionsAccessor.setSeed(new Random().nextLong());
         deleteWorldDirectory(data);
         try {
@@ -59,7 +59,7 @@ public class WorldReset {
             LOGGER.fatal(e.toString());
         }
 //        data.clearWorldData();
-//        findAndEditLevelDat(data);
+        findAndEditLevelDat(data);
 //        data.serverAccessor.getWorlds().replace(World.OVERWORLD, null);
         // change seed
 
@@ -92,26 +92,11 @@ public class WorldReset {
 //        Path directoryPath = data.session.getDirectory(WorldSavePath.ROOT);
 //        File directory = directoryPath.toFile();
         do { // level.dat
-//            Optional<File> first = Arrays.stream(Objects.requireNonNull(directory.listFiles())).filter((file1 -> file1.getName().equals("level.dat"))).findFirst();
-//            if (!first.isPresent()) break;
-//            File level = first.get();
-            File level = data.dataDir.toFile();
-//            JsonObject levelJson = new String(FileUtils.readFileToByteArray(level), StandardCharsets.UTF_8);
-            CompoundTag compoundTag = null;
             try {
-                compoundTag = NbtIo.read(level);
+                NbtIo.write(data.newLevelDat, data.dataDir.toFile());
             } catch (IOException e) {
-//                throw new RuntimeException(e);
-                LOGGER.fatal("{}@WorldReset.java:105", e.toString());
-//                throw e;
-            } finally {
-                assert compoundTag != null;
-                compoundTag.toText();
+                LOGGER.fatal(e.fillInStackTrace());
             }
-            break;
-//            assert compoundTag != null;
-//            System.out.println(compoundTag.toText());
-//            System.out.println(compoundTag.getCompound("Data").getCompound("WorldGenSettings").toText());
         } while (false);
 //        System.out.println(directory.toAbsolutePath());
 
