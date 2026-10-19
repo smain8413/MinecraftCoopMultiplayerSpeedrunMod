@@ -24,12 +24,14 @@ import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static com.github.smain8413.untitled.Untitled.LOGGER;
 
@@ -41,34 +43,31 @@ public class WorldReset {
     protected static void deleteWorld(ServerWorld world) {
         WorldData data = new WorldData(world);
 //        if (true) return;
-        data.server.save(false, true, false);
+//        data.server.save(false, true, false);
         // unlock
 //        Path WorldDir = data.session.getDirectory(WorldSavePath.ROOT);
 //        Path DataDir = data.session.getDirectory(WorldSavePath.LEVEL_DAT);
         WorldData safeWorld = evacuatePlayers(data);
-        try {
-            unlock(data);
-        } catch (IOException e) {
-            LOGGER.fatal(e.toString());
-        }
+//        try {
+//            unlock(data);
+//        } catch (IOException e) {
+//            LOGGER.fatal(e.toString());
+//        }
 //        data.generatorOptionsAccessor.setSeed(new Random().nextLong());
         deleteWorldDirectory(data);
-        try {
-            lock(data);
-        } catch (IOException e) {
-            LOGGER.fatal(e.toString());
-        }
+//        try {
+//            lock(data);
+//        } catch (IOException e) {
+//            LOGGER.fatal(e.toString());
+//        }
 //        data.clearWorldData();
         findAndEditLevelDat(data);
 //        data.serverAccessor.getWorlds().replace(World.OVERWORLD, null);
         // change seed
 
+
         // queue re-lock
         queueRunAction(safeWorld, new QueuedAction(() -> {
-//            @SuppressWarnings("OptionalGetWithoutIsPresent") File levelData = Arrays.stream(Objects.requireNonNull(safeWorld.session.getDirectory(WorldSavePath.ROOT).toFile().listFiles())).filter(file -> file.getName().equals("level.dat")).findFirst().get();
-            safeWorld.generatorOptionsAccessor.setSeed(new Random().nextLong());
-//            safeWorld.generatorOptionsAccessor
-//            evacuatePlayers(safeWorld);
             safeWorld.serverAccessor.untitled$createWorlds(new WorldGenerationProgressListener() {
                 @Override
                 public void start(ChunkPos spawnPos) {
@@ -82,10 +81,27 @@ public class WorldReset {
                 public void stop() {
                 }
             });
+            //            @SuppressWarnings("OptionalGetWithoutIsPresent") File levelData = Arrays.stream(Objects.requireNonNull(safeWorld.session.getDirectory(WorldSavePath.ROOT).toFile().listFiles())).filter(file -> file.getName().equals("level.dat")).findFirst().get();
+//            safeWorld.generatorOptionsAccessor.setSeed(new Random().nextLong());
+//            safeWorld.generatorOptionsAccessor
+//            evacuatePlayers(safeWorld);
+//            safeWorld.serverAccessor.untitled$createWorlds(new WorldGenerationProgressListener() {
+//                @Override
+//                public void start(ChunkPos spawnPos) {
+//                }
+//
+//                @Override
+//                public void setChunkStatus(ChunkPos pos, @Nullable ChunkStatus status) {
+//                }
+//
+//                @Override
+//                public void stop() {
+//                }
+//            });
             killEveryone(safeWorld);
 //            safeWorld.clearWorldData();
 //            data.generatorOptionsAccessor.setSeed(new Random().nextLong());
-        }, 100));
+        }, 1));
     }
 
     protected static void findAndEditLevelDat(WorldData data) {
@@ -93,9 +109,17 @@ public class WorldReset {
 //        File directory = directoryPath.toFile();
         do { // level.dat
             try {
-                NbtIo.write(data.newLevelDat, data.dataDir.toFile());
+                NbtIo.writeCompressed(data.newLevelDat, Files.newOutputStream(data.dataDir));
             } catch (IOException e) {
                 LOGGER.fatal(e.fillInStackTrace());
+            }
+
+            try {
+                GZIPInputStream gzip = null;
+                gzip = new GZIPInputStream(Files.newInputStream(data.dataDir));
+                NbtIo.read(new DataInputStream(gzip));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         } while (false);
 //        System.out.println(directory.toAbsolutePath());
@@ -129,6 +153,7 @@ public class WorldReset {
         for (int i = 0; i < data.serverWorld.getPlayers().size(); i++) {
             ServerPlayerEntity player = data.serverWorld.getPlayers().get(i);
             BlockPos destinationSpawn = destination.getSpawnPos();
+            if (destination.getRegistryKey().equals(ServerWorld.END)) destinationSpawn.add(0, 100000, 0);
             player.teleport(destination, destinationSpawn.getX(), destinationSpawn.getY() + 1, destinationSpawn.getZ(), 0, 0);
         }
         return new WorldData(destination);

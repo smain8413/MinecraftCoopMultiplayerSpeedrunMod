@@ -16,6 +16,8 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 
 import java.util.Random;
 
@@ -44,4 +46,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Sc
         WorldReset.Reset(server);
         return false;
     }
+
+//    @Inject(method = "dimensionChanged", at= @At("TAIL"))
 }

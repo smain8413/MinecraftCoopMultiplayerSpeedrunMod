@@ -46,21 +46,21 @@ public final class WorldData {
     public final Path dataDir;
     public final File worldDir;
     public CompoundTag newLevelDat;
-    public boolean cleared = false;
-
-    private static final List<String> NOT_WORLD;
-
-    static {
-        NOT_WORLD = new ArrayList<>();
-        NOT_WORLD.add("NOT_WORLD");
-        NOT_WORLD.add("worldRegistryKey");
-        NOT_WORLD.add("cleared");
-        NOT_WORLD.add("session");
-        NOT_WORLD.add("sessionAccessor");
-        NOT_WORLD.add("generatorOptionsAccessor");
-        NOT_WORLD.add("Server");
-        NOT_WORLD.add("generatorOptionsAccessor");
-    }
+//    public boolean cleared = false;
+//
+//    private static final List<String> NOT_WORLD;
+//
+//    static {
+//        NOT_WORLD = new ArrayList<>();
+//        NOT_WORLD.add("NOT_WORLD");
+//        NOT_WORLD.add("worldRegistryKey");
+//        NOT_WORLD.add("cleared");
+//        NOT_WORLD.add("session");
+//        NOT_WORLD.add("sessionAccessor");
+//        NOT_WORLD.add("generatorOptionsAccessor");
+//        NOT_WORLD.add("Server");
+//        NOT_WORLD.add("generatorOptionsAccessor");
+//    }
 
 
     public WorldData(ServerWorld serverWorld) {
@@ -133,20 +133,20 @@ public final class WorldData {
         data.getCompound("Data").remove("Player");
         return data;
     }
-
-    public void clearWorldData() {
-        Field[] declaredFields = this.getClass().getDeclaredFields();
-        for (Field field : declaredFields) {
-            if (NOT_WORLD.parallelStream().anyMatch(string -> string.equals(field.getName()))) continue;
-            try {
-                field.setAccessible(true);
-                field.set(this, null);
-            } catch (IllegalAccessException e) {
-                LOGGER.fatal(e.toString());
-            }
-        }
-        cleared = true;
-    }
+//
+//    public void clearWorldData() {
+//        Field[] declaredFields = this.getClass().getDeclaredFields();
+//        for (Field field : declaredFields) {
+//            if (NOT_WORLD.parallelStream().anyMatch(string -> string.equals(field.getName()))) continue;
+//            try {
+//                field.setAccessible(true);
+//                field.set(this, null);
+//            } catch (IllegalAccessException e) {
+//                LOGGER.fatal(e.toString());
+//            }
+//        }
+//        cleared = true;
+//    }
 
     public boolean isWorld(@Nullable RegistryKey<World> world) {
         if (world == null) {

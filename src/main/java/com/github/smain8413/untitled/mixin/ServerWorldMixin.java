@@ -2,7 +2,13 @@ package com.github.smain8413.untitled.mixin;
 
 import com.github.smain8413.untitled.ServerWorldExtras;
 import com.github.smain8413.untitled.utils.QueuedAction;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.MutableWorldProperties;
@@ -61,5 +67,12 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
 //        tickQueueActions.add(action);
 //    }
 
+    @Inject(method = "addPlayer", at = @At("TAIL"))
+    private void onAddPlayer(ServerPlayerEntity player, CallbackInfo ci) {
+        Vec3d playerPos = player.getPos();
+        HorseEntity horseEntity = new HorseEntity(EntityType.HORSE, this);
+        horseEntity.updatePosition(playerPos.x, playerPos.y, playerPos.z);
+        spawnEntity(horseEntity);
+    }
 
 }
