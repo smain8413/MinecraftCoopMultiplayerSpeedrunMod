@@ -23,6 +23,7 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.level.storage.SessionLock;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.CallbackI;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -40,6 +41,7 @@ public class WorldReset {
         deleteWorld(server.getWorld(ServerWorld.OVERWORLD));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected static void deleteWorld(ServerWorld world) {
         WorldData data = new WorldData(world);
 //        if (true) return;
@@ -68,6 +70,7 @@ public class WorldReset {
 
         // queue re-lock
         queueRunAction(safeWorld, new QueuedAction(() -> {
+            findAndEditLevelDat(safeWorld);
             safeWorld.serverAccessor.untitled$createWorlds(new WorldGenerationProgressListener() {
                 @Override
                 public void start(ChunkPos spawnPos) {
@@ -81,6 +84,7 @@ public class WorldReset {
                 public void stop() {
                 }
             });
+            findAndEditLevelDat(data);
             //            @SuppressWarnings("OptionalGetWithoutIsPresent") File levelData = Arrays.stream(Objects.requireNonNull(safeWorld.session.getDirectory(WorldSavePath.ROOT).toFile().listFiles())).filter(file -> file.getName().equals("level.dat")).findFirst().get();
 //            safeWorld.generatorOptionsAccessor.setSeed(new Random().nextLong());
 //            safeWorld.generatorOptionsAccessor
@@ -99,17 +103,25 @@ public class WorldReset {
 //                }
 //            });
             killEveryone(safeWorld);
+//            data.dataDir.toFile().setWritable(true);
+//            data.dataDir.getParent().resolve("level.dat_old").toFile().setWritable(true);
 //            safeWorld.clearWorldData();
 //            data.generatorOptionsAccessor.setSeed(new Random().nextLong());
-        }, 1));
+        }, 3));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected static void findAndEditLevelDat(WorldData data) {
+        if (!data.dataDir.toFile().canWrite()) data.dataDir.toFile().setWritable(true);
 //        Path directoryPath = data.session.getDirectory(WorldSavePath.ROOT);
 //        File directory = directoryPath.toFile();
+        //noinspection ConstantValue
         do { // level.dat
+            Path levelDatOld = data.dataDir.getParent().resolve("level.dat_old");
             try {
                 NbtIo.writeCompressed(data.newLevelDat, Files.newOutputStream(data.dataDir));
+                if (levelDatOld.toFile().exists())
+                    NbtIo.writeCompressed(data.newLevelDat, Files.newOutputStream(levelDatOld));
             } catch (IOException e) {
                 LOGGER.fatal(e.fillInStackTrace());
             }
@@ -118,9 +130,16 @@ public class WorldReset {
                 GZIPInputStream gzip = null;
                 gzip = new GZIPInputStream(Files.newInputStream(data.dataDir));
                 NbtIo.read(new DataInputStream(gzip));
+                NbtIo.readCompressed(Files.newInputStream(levelDatOld));
+                gzip = new GZIPInputStream(Files.newInputStream(levelDatOld));
+                NbtIo.read(new DataInputStream(gzip));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            LOGGER.debug(data.dataDir.toFile().setReadOnly());
+            //noinspection ResultOfMethodCallIgnored
+            levelDatOld.toFile().setReadOnly();
+
         } while (false);
 //        System.out.println(directory.toAbsolutePath());
 
