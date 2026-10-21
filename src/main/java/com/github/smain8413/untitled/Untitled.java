@@ -12,8 +12,12 @@ import net.minecraft.world.gen.feature.LakeFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Untitled implements ModInitializer {
 
@@ -32,13 +36,20 @@ public class Untitled implements ModInitializer {
 
 //        EntityAttrib
 //        LakeFeature.
-
+//        new Thread(() -> {
+//            try {
+//                watchService(Paths.get("/Users/smain8413/IdeaProjects/untitled/run/saves/New World/level.dat"));
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }));
+//        ExecutorService executorService  = Executors.newSingleThreadScheduledExecutor();
     }
-    public void something() {
-//        serverStuff.forceCloseRegionFiles(null);
+//    public static void watchService(Path path) throws IOException {
+//        WatchService watchService = FileSystems.getDefault().newWatchService();
+//        WatchKey key = path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
 //
-
-    }
+//    }
 
     public static final RegistryKey<World> TEMP_WORLD = RegistryKey.of(
             Registry.DIMENSION,

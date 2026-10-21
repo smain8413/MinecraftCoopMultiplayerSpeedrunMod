@@ -70,7 +70,7 @@ public class WorldReset {
 
         // queue re-lock
         queueRunAction(safeWorld, new QueuedAction(() -> {
-            findAndEditLevelDat(safeWorld);
+//            findAndEditLevelDat(safeWorld);
             safeWorld.serverAccessor.untitled$createWorlds(new WorldGenerationProgressListener() {
                 @Override
                 public void start(ChunkPos spawnPos) {
@@ -84,7 +84,7 @@ public class WorldReset {
                 public void stop() {
                 }
             });
-            findAndEditLevelDat(data);
+//            findAndEditLevelDat(data);
             //            @SuppressWarnings("OptionalGetWithoutIsPresent") File levelData = Arrays.stream(Objects.requireNonNull(safeWorld.session.getDirectory(WorldSavePath.ROOT).toFile().listFiles())).filter(file -> file.getName().equals("level.dat")).findFirst().get();
 //            safeWorld.generatorOptionsAccessor.setSeed(new Random().nextLong());
 //            safeWorld.generatorOptionsAccessor
@@ -118,6 +118,7 @@ public class WorldReset {
         //noinspection ConstantValue
         do { // level.dat
             Path levelDatOld = data.dataDir.getParent().resolve("level.dat_old");
+            if (!levelDatOld.toFile().canWrite()) levelDatOld.toFile().setWritable(true);
             try {
                 NbtIo.writeCompressed(data.newLevelDat, Files.newOutputStream(data.dataDir));
                 if (levelDatOld.toFile().exists())
@@ -130,15 +131,16 @@ public class WorldReset {
                 GZIPInputStream gzip = null;
                 gzip = new GZIPInputStream(Files.newInputStream(data.dataDir));
                 NbtIo.read(new DataInputStream(gzip));
-                NbtIo.readCompressed(Files.newInputStream(levelDatOld));
-                gzip = new GZIPInputStream(Files.newInputStream(levelDatOld));
-                NbtIo.read(new DataInputStream(gzip));
+                if (levelDatOld.toFile().exists()) {
+                    NbtIo.readCompressed(Files.newInputStream(levelDatOld));
+                    gzip = new GZIPInputStream(Files.newInputStream(levelDatOld));
+                    NbtIo.read(new DataInputStream(gzip));
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            LOGGER.debug(data.dataDir.toFile().setReadOnly());
-            //noinspection ResultOfMethodCallIgnored
-            levelDatOld.toFile().setReadOnly();
+            System.out.printf("dataDir setReadonly: %s%n", data.dataDir.toFile().setReadOnly());
+            if (levelDatOld.toFile().exists()) levelDatOld.toFile().setReadOnly();
 
         } while (false);
 //        System.out.println(directory.toAbsolutePath());
@@ -148,8 +150,7 @@ public class WorldReset {
     protected static void unlock(WorldData data) throws IOException {
         // region experimental
         try {
-            ;
-//            data.threadedAnvilChunkStorageAccessor.untitled$save(true);
+            //            data.threadedAnvilChunkStorageAccessor.untitled$save(true);
 //            data.serverChunkManager.tick(() -> true);
 //            for (int i = 0; i < 4; i++) {
 //                data.serverChunkManagerAccessor.getChunkCache()[i] = null;

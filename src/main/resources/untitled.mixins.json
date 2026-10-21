@@ -18,7 +18,8 @@
     "ServerWorldAccessor",
     "ServerWorldMixin",
     "SessionAccessor",
-    "ThreadedAnvilChunkStorageAccessor"
+    "ThreadedAnvilChunkStorageAccessor",
+    "ThreadExecutorMixin"
   ],
   "client": [
   ],
