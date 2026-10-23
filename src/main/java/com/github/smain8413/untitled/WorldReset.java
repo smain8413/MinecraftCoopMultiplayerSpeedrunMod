@@ -157,6 +157,7 @@ public class WorldReset {
 //            }
 //            data.serverChunkManager.close();
 //            data.serverChunkManager.
+            ;
         } catch (Exception e) {
             LOGGER.fatal(e.toString());
         }

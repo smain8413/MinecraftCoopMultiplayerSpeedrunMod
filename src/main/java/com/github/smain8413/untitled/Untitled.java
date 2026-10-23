@@ -1,26 +1,21 @@
 package com.github.smain8413.untitled;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.gen.feature.LakeFeature;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Untitled implements ModInitializer {
 
+
+    public static WatchService WATCHER;
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "coop_mod";
     @Override
@@ -44,12 +39,18 @@ public class Untitled implements ModInitializer {
 //            }
 //        }));
 //        ExecutorService executorService  = Executors.newSingleThreadScheduledExecutor();
+        try {
+            WATCHER = watchService(Paths.get("/Users/smain8413/IdeaProjects/untitled/run/saves/New World"));
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-//    public static void watchService(Path path) throws IOException {
-//        WatchService watchService = FileSystems.getDefault().newWatchService();
-//        WatchKey key = path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
-//
-//    }
+    public static WatchService watchService(Path path) throws IOException {
+        WatchService watchService = FileSystems.getDefault().newWatchService();
+        path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
+        return watchService;
+    }
 
     public static final RegistryKey<World> TEMP_WORLD = RegistryKey.of(
             Registry.DIMENSION,
