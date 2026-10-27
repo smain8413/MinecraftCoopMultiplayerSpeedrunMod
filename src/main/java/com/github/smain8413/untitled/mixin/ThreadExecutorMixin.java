@@ -1,6 +1,7 @@
 package com.github.smain8413.untitled.mixin;
 
 import com.github.smain8413.untitled.Untitled;
+import com.github.smain8413.untitled.WorldReset;
 import net.minecraft.util.thread.MessageListener;
 import net.minecraft.util.thread.ThreadExecutor;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +18,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.sql.Time;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -63,10 +65,17 @@ public abstract class ThreadExecutorMixin<R extends Runnable> implements Message
 
 //                if(task instanceof Lambda)
                 for (WatchEvent<?> event : key.pollEvents()) {
+                    if (!event.context().toString().equals("level.dat")) continue;
                     //process
                     System.out.println(
                             "Event kind:" + event.kind()
                                     + ". File affected: " + event.context() + ".");
+//                    if (task instanceof CompletableFuture) {
+////                        ((CompletableFuture) task)
+//                        CompletableFuture.UniCompose.class
+
+//                    }
+
                 }
                 key.reset();
             }

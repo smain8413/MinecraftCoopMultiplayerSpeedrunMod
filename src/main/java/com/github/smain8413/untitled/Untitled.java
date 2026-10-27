@@ -1,6 +1,7 @@
 package com.github.smain8413.untitled;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -18,6 +19,9 @@ public class Untitled implements ModInitializer {
     public static WatchService WATCHER;
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "coop_mod";
+
+    public static MinecraftServer SERVER;
+
     @Override
     public void onInitialize() {
         System.out.println("what");

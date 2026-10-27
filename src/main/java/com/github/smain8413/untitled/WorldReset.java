@@ -29,7 +29,12 @@ import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -143,6 +148,12 @@ public class WorldReset {
             if (levelDatOld.toFile().exists()) levelDatOld.toFile().setReadOnly();
 
         } while (false);
+        try {
+            System.out.println(Arrays.toString(Files.readAttributes(data.dataDir, PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).permissions().toArray()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+//        Files.setAttribute(data, , true, )
 //        System.out.println(directory.toAbsolutePath());
 
     }

@@ -9,6 +9,7 @@
   "license": "All-Rights-Reserved",
   "icon": "assets/untitled/icon.png",
   "environment": "*",
+  "accessWidener": "Untitled.classtweaker",
   "entrypoints": {
     "client": [
       "com.github.smain8413.untitled.client.UntitledClient"
