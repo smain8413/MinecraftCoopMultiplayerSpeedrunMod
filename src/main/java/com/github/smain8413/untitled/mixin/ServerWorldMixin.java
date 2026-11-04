@@ -1,13 +1,11 @@
 package com.github.smain8413.untitled.mixin;
 
-import com.github.smain8413.untitled.ServerWorldExtras;
+import com.github.smain8413.untitled.utils.ServerWorldExtras;
 import com.github.smain8413.untitled.utils.QueuedAction;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.RegistryKey;

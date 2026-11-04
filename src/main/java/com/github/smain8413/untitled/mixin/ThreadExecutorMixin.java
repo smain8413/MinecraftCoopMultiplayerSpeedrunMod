@@ -2,6 +2,7 @@ package com.github.smain8413.untitled.mixin;
 
 import com.github.smain8413.untitled.Untitled;
 import com.github.smain8413.untitled.WorldReset;
+import com.github.smain8413.untitled.utils.WorldData;
 import net.minecraft.util.thread.MessageListener;
 import net.minecraft.util.thread.ThreadExecutor;
 import org.apache.logging.log4j.Logger;
@@ -55,32 +56,37 @@ public abstract class ThreadExecutorMixin<R extends Runnable> implements Message
     private void onExecute(R task, CallbackInfo ci) {
 //        WatchKey key = Untitled.WATCHER.poll();
 //        System.out.println("uhhhhhhhh");
-        WatchKey key;
-        try {
-            while ((key = Untitled.WATCHER.poll(10, TimeUnit.MICROSECONDS)) != null) {
-                System.out.println(Arrays.toString(getThread().getStackTrace()));
-
-//                System.out.println(task.getClass().getClass());
-                System.out.println(task + ": ");
-
-//                if(task instanceof Lambda)
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    if (!event.context().toString().equals("level.dat")) continue;
-                    //process
-                    System.out.println(
-                            "Event kind:" + event.kind()
-                                    + ". File affected: " + event.context() + ".");
-//                    if (task instanceof CompletableFuture) {
-////                        ((CompletableFuture) task)
-//                        CompletableFuture.UniCompose.class
-
-//                    }
-
-                }
-                key.reset();
-            }
-        } catch (Exception e) {
-            LOGGER.fatal("very bad (ThreadExecutorMixin 1)");
-        }
+//        boolean fileEdit = false;
+//        WatchKey key;
+//        try {
+//            while ((key = Untitled.WATCHER.poll(10, TimeUnit.MICROSECONDS)) != null) {
+//                System.out.println(Arrays.toString(getThread().getStackTrace()));
+//
+////                System.out.println(task.getClass().getClass());
+//                System.out.println(task + ": ");
+//
+////                if(task instanceof Lambda)
+//                for (WatchEvent<?> event : key.pollEvents()) {
+//                    fileEdit = fileEdit || event.context().toString().equals("level.dat");
+//                    if (!event.context().toString().equals("level.dat")) continue;
+//                    //process
+//                    System.out.println(
+//                            "Event kind:" + event.kind()
+//                                    + ". File affected: " + event.context() + ".");
+////                    if (task instanceof CompletableFuture) {
+//////                        ((CompletableFuture) task)
+////                        CompletableFuture.UniCompose.class
+//
+////                    }
+//
+//                }
+//                key.reset();
+//            }
+//        } catch (Exception e) {
+//            LOGGER.fatal("very bad (ThreadExecutorMixin 1)");
+//        }
+//        if (fileEdit) {
+//            WorldReset.findAndEditLevelDat(new WorldData(Untitled.SERVER.getOverworld()));
+//        }
     }
 }

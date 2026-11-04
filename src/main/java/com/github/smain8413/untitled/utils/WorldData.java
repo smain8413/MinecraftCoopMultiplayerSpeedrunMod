@@ -1,6 +1,5 @@
 package com.github.smain8413.untitled.utils;
 
-import com.github.smain8413.untitled.ServerWorldExtras;
 import com.github.smain8413.untitled.mixin.*;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
@@ -16,15 +15,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import static com.github.smain8413.untitled.Untitled.LOGGER;
 

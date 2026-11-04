@@ -45,7 +45,6 @@ public class Untitled implements ModInitializer {
 //        ExecutorService executorService  = Executors.newSingleThreadScheduledExecutor();
         try {
             WATCHER = watchService(Paths.get("/Users/smain8413/IdeaProjects/untitled/run/saves/New World"));
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -7,7 +7,6 @@
     "ChunkGeneratorAccessor",
     "ChunkTicketManagerAccessor",
     "ChunkTicketManagerMixin",
-    "CompletableFutureMixin",
     "GeneratorOptionsAccessor",
     "LivingEntityMixin",
     "MainMenuMixin",

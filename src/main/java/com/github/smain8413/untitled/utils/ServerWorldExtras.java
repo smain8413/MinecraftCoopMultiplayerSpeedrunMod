@@ -1,6 +1,4 @@
-package com.github.smain8413.untitled;
-
-import com.github.smain8413.untitled.utils.QueuedAction;
+package com.github.smain8413.untitled.utils;
 
 import java.util.ArrayList;
 import java.util.List;

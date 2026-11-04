@@ -4,6 +4,7 @@ import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -21,4 +22,11 @@ public interface ServerChunkManagerAccessor {
     @Accessor("chunkCache")
     @Mutable
     Chunk[] getChunkCache();
+
+    @Accessor("chunkGenerator")
+    @Mutable
+    void untitled$setChunkGenerator(ChunkGenerator generator);
+
+    @Accessor("chunkGenerator")
+    ChunkGenerator untitled$getChunkGenerator();
 }
