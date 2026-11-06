@@ -8,6 +8,7 @@
     "ChunkTicketManagerAccessor",
     "ChunkTicketManagerMixin",
     "GeneratorOptionsAccessor",
+    "LavaLakeDecoratorMixin",
     "LivingEntityMixin",
     "MainMenuMixin",
     "OnWorldJoinMixin",

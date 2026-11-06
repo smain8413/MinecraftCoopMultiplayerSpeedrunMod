@@ -1,11 +1,16 @@
 package com.github.smain8413.untitled;
 
+//import com.github.smain8413.untitled.utils.AdvancementTrackerExtras;
 import com.github.smain8413.untitled.utils.QueuedAction;
 import com.github.smain8413.untitled.utils.WorldData;
 //import com.google.gson.JsonObject;
 //import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Lifecycle;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementCriterion;
+import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.advancement.criterion.Criterion;
 import net.minecraft.data.SnbtProvider;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +19,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.JsonHelper;
@@ -51,7 +57,6 @@ public class WorldReset {
         deleteWorld(server.getWorld(ServerWorld.OVERWORLD));
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     protected static void deleteWorld(ServerWorld world) {
         long seed = new Random().nextLong();
         WorldData data = new WorldData(world);
@@ -123,13 +128,13 @@ public class WorldReset {
 //            data.dataDir.getParent().resolve("level.dat_old").toFile().setWritable(true);
 //            safeWorld.clearWorldData();
 //            data.generatorOptionsAccessor.setSeed(new Random().nextLong());
-        }, 1));
+        }, 0));
 
         queueRunAction(new WorldData(data.server.getOverworld()), new QueuedAction(() -> {
             for (int i = 0; i < safeWorld.serverWorld.getPlayers().size(); i++) {
                 safeWorld.server.getPlayerManager().respawnPlayer(safeWorld.serverWorld.getPlayers().get(i), false);
             }
-        }, 2));
+        }, 1));
     }
 //
 //    @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -217,6 +222,21 @@ public class WorldReset {
     protected static void killEveryone(WorldData data) {
         List<ServerPlayerEntity> players = data.serverWorld.getPlayers();
         for (int i = 0; i < players.size(); i++) {
+            players.get(i).inventory.clear();
+            players.get(i).getEnderChestInventory().clear();
+//            players.get(i).getAdvancementTracker().clearCriteria();
+//            players.get(i).getAdvancementTracker().getProgress()
+//            for (Criterion<?> criterion: Criteria.getCriteria()) {
+//                players.get(i).getAdvancementTracker().getProgress().
+//            }
+            Collection<Advancement> collection = data.server.getAdvancementLoader().getAdvancements();
+            for (Advancement advancement: collection) {
+                Iterable<String> criteria = players.get(i).getAdvancementTracker().getProgress(advancement).getObtainedCriteria();
+                for (String criterion: criteria) {
+                    players.get(i).getAdvancementTracker().revokeCriterion(advancement, criterion);
+//                    players.get(i).getAdvancementTracker().getProgress(advancement).reset(criterion);
+                }
+            }
             players.get(i).kill();
         }
     }

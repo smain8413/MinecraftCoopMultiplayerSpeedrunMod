@@ -43,17 +43,17 @@ public class Untitled implements ModInitializer {
 //            }
 //        }));
 //        ExecutorService executorService  = Executors.newSingleThreadScheduledExecutor();
-        try {
-            WATCHER = watchService(Paths.get("/Users/smain8413/IdeaProjects/untitled/run/saves/New World"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            WATCHER = watchService(Paths.get("/Users/smain8413/IdeaProjects/untitled/run/saves/New World"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
-    public static WatchService watchService(Path path) throws IOException {
-        WatchService watchService = FileSystems.getDefault().newWatchService();
-        path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
-        return watchService;
-    }
+//    public static WatchService watchService(Path path) throws IOException {
+//        WatchService watchService = FileSystems.getDefault().newWatchService();
+//        path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE);
+//        return watchService;
+//    }
 
     public static final RegistryKey<World> TEMP_WORLD = RegistryKey.of(
             Registry.DIMENSION,
