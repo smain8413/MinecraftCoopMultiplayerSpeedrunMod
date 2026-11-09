@@ -1,9 +1,12 @@
 package com.github.smain8413.untitled.mixin;
 
+import com.github.smain8413.untitled.utils.ProgressData;
 import com.github.smain8413.untitled.utils.ServerWorldExtras;
 import com.github.smain8413.untitled.utils.QueuedAction;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
@@ -13,6 +16,9 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.level.ServerWorldProperties;
+import net.minecraft.world.level.storage.LevelStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -55,16 +62,6 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
         if (first.getTicksTillRun() <= 0) tickQueueActions.remove(first);
     }
 
-//    @Unique
-//    private static void runNextTick(QueuedAction action) {
-//        tickQueueActions.add(action);
-//    }
-//
-
-//    public static void runNextTick(QueuedAction action) {
-//        tickQueueActions.add(action);
-//    }
-
     @Inject(method = "addPlayer", at = @At("TAIL"))
     private void onAddPlayer(ServerPlayerEntity player, CallbackInfo ci) {
         Vec3d playerPos = player.getPos();
@@ -73,4 +70,9 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
         spawnEntity(horseEntity);
     }
 
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void onConstruct(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey registryKey, RegistryKey registryKey2, DimensionType dimensionType, WorldGenerationProgressListener generationProgressListener, ChunkGenerator chunkGenerator, boolean bl, long l, List list, boolean bl2, CallbackInfo ci)
+    {
+
+    }
 }

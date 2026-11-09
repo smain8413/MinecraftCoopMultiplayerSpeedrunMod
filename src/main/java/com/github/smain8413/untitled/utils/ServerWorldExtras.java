@@ -7,5 +7,6 @@ import java.util.List;
 public interface ServerWorldExtras {
      List<QueuedAction> tickQueueActions = new ArrayList<>();
 
+
      void untitled$runNextTick(QueuedAction action);
 }

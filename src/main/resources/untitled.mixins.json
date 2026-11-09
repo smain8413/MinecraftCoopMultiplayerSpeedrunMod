@@ -12,6 +12,7 @@
     "LivingEntityMixin",
     "MainMenuMixin",
     "OnWorldJoinMixin",
+    "PlayerManagerMixin",
     "ServerAccessor",
     "ServerChunkManagerAccessor",
     "ServerMixin",
@@ -23,6 +24,7 @@
     "ThreadExecutorMixin"
   ],
   "client": [
+    "IntegratedServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
